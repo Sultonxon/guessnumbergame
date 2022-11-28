@@ -1,4 +1,5 @@
-﻿using GuessingGame.Models;
+﻿using GuessingGame.Data;
+using GuessingGame.Models;
 using GuessingGame.Repositories.Interfaces;
 using GuessingGame.Services.Interfaces;
 using Microsoft.EntityFrameworkCore.InMemory.Query.Internal;
@@ -10,12 +11,15 @@ public class GameService : IGameService
 {
     private readonly IGameRepository _gameRepository;
     private readonly IGamerRepository _gamerRepository;
+    private readonly AppDbContext _conterxt;
 
-    public GameService(IGameRepository gameRepository, IGamerRepository gamerRepository)
+    public GameService(IGameRepository gameRepository, IGamerRepository gamerRepository, AppDbContext context)
     {
         _gameRepository = gameRepository;
         _gamerRepository = gamerRepository;
+        _conterxt = context;
     }
+
 
     public Game Start(string name)
     {
@@ -65,15 +69,21 @@ public class GameService : IGameService
     }
 
     public Check Try(int id, int guess)
-    {
+    {       
         var game = _gameRepository.Get(id);
         Console.WriteLine("]]]]]]]]]]]]" + game.GuessNumber);
-        if(guess > 9999 || guess < 1000) return new Check { M = 0, P= 0 };
+        if (game.State != Models.Enums.GameState.Created && game.State != Models.Enums.GameState.Playing)
+        {
+            return new Check { M = -1, P = -1, Playing = false };
+        }
+
+        if (guess > 9999 || guess < 1000) return new Check { M = 0, P= 0 };
         game.GuessNumber = _gameRepository.Get(game.Id).GuessNumber;
         game.Trying++;
         var guessDigits = Digits(guess);
         var secretDigits = Digits(game.GuessNumber) ;
         Check result = new Check();
+        
         for (int i = 0; i < 4; i++)
         {
             if (guessDigits[i] == secretDigits[0] || guessDigits[i] == secretDigits[1]
@@ -87,12 +97,19 @@ public class GameService : IGameService
                 result.P++;
         }
 
+        _conterxt.Logs.Add(new Log { GameId = game.Id, Step = game.Trying, number = guess, M = result.M, P = result.P });
+        _conterxt.SaveChanges();
+        result.Logs = _conterxt.Logs.Where(x => x.GameId == game.Id).ToList();
         if (result.P == 4)
             game.State = Models.Enums.GameState.Completed;
         if (result.P != 4 && game.Trying >= 8)
             game.State = Models.Enums.GameState.Failed;
-
         _gameRepository.Update(game);
+        
+        if(game.State == Models.Enums.GameState.Completed)
+        {
+            result.Success = true;
+        }
         return result;        
     }
 

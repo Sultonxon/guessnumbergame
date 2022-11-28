@@ -17,7 +17,13 @@ builder.Services.AddScoped<IGameRepository, GameRepository>();
 builder.Services.AddScoped<IGamerRepository, GamerRepository>();
 builder.Services.AddScoped<IGameService, GameService>();
 
-
+builder.Services.AddCors(o =>
+{
+    o.AddPolicy("Enable", p =>
+    {
+        p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
+});
 builder.Services.AddControllers().AddNewtonsoftJson(o =>
 {
     o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
@@ -34,6 +40,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("Enable");
 
 app.UseHttpsRedirection();
 

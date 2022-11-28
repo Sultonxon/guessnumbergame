@@ -12,6 +12,8 @@ public class AppDbContext: DbContext
 
     public DbSet<Game> Games { get; set; }
 
+    public DbSet<Log> Logs { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
