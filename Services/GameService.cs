@@ -72,10 +72,7 @@ public class GameService : IGameService
     {       
         var game = _gameRepository.Get(id);
         Console.WriteLine("]]]]]]]]]]]]" + game.GuessNumber);
-        if (game.State != Models.Enums.GameState.Created && game.State != Models.Enums.GameState.Playing)
-        {
-            return new Check { M = -1, P = -1, Playing = false };
-        }
+        
 
         if (guess > 9999 || guess < 1000) return new Check { M = 0, P= 0 };
         game.GuessNumber = _gameRepository.Get(game.Id).GuessNumber;
@@ -109,6 +106,7 @@ public class GameService : IGameService
         if(game.State == Models.Enums.GameState.Completed)
         {
             result.Success = true;
+            result.Playing = false;
         }
         return result;        
     }

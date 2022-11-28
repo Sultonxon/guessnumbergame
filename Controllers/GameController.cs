@@ -17,7 +17,6 @@ namespace GuessingGame.Controllers
         public IActionResult StartPlay(string name)
         {
             var game = _gameService.Start(name);
-            game.GuessNumber = 0;
             return Ok(game);
         }
 
@@ -26,12 +25,7 @@ namespace GuessingGame.Controllers
         {
 
             var result = _gameService.Try(id, answer);
-            if(!result.Playing && !result.Success)
-            {
-                return Ok("Failed");
-            }
-            if (result.Success)
-                return Ok("Successed");
+            
             return Ok(result);
         }
 
