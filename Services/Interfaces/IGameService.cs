@@ -14,4 +14,10 @@ public interface IGameService
     Game Get(int id);
 
     IList GetGamers();
+
+    IList GetLiders(int minWons = 0);
+
+    public Object GetLider(int id);
+
+    public List<Log> GetGameLogs(int gameId);
 }

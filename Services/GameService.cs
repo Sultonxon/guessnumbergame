@@ -41,10 +41,14 @@ public class GameService : IGameService
     private int GenerateNumber(int numberOfDigits)
     {
 
-        List<int> list = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        List<int> list = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         var n = 0;
         int d;
-        for (int i = 0; i < numberOfDigits; i++)
+        d = list[Random.Shared.Next(0, list.Count - 1)];
+        n = n * 10 + d;
+        list.Remove(d);
+        list.Add(0);
+        for (int i = 1; i < numberOfDigits; i++)
         {
             d = list[Random.Shared.Next(0, list.Count - 1)];
             n = n * 10 + d;
@@ -94,13 +98,16 @@ public class GameService : IGameService
                 result.P++;
         }
 
-        _conterxt.Logs.Add(new Log { GameId = game.Id, Step = game.Trying, number = guess, M = result.M, P = result.P });
+        _conterxt.Logs.Add(new Log { GameId = game.Id, Step = game.Trying, Number = guess, M = result.M, P = result.P });
         _conterxt.SaveChanges();
         result.Logs = _conterxt.Logs.Where(x => x.GameId == game.Id).ToList();
         if (result.P == 4)
             game.State = Models.Enums.GameState.Completed;
         if (result.P != 4 && game.Trying >= 8)
             game.State = Models.Enums.GameState.Failed;
+        if (result.P != 4 && game.Trying < 8)
+            game.State = Models.Enums.GameState.Playing;
+
         _gameRepository.Update(game);
         
         if(game.State == Models.Enums.GameState.Completed)
@@ -140,4 +147,24 @@ public class GameService : IGameService
                                                y.State == Models.Enums.GameState.Ended ||
                                                y.State == Models.Enums.GameState.Playing)
     }).ToList();
+
+    public IList GetLiders(int minWons = 0) => _gamerRepository.GetAll()
+        .Where(x => x.Games is null ? false : x.Games.Where(y => y.State == Models.Enums.GameState.Completed).Any())
+        .Select(x => new 
+                {
+                    x.Id,
+                    x.Name, 
+                    GameCount = x.Games.Count(x => x.State == Models.Enums.GameState.Completed),
+                    Record = x.Games.Any(y => y.State== Models.Enums.GameState.Completed)
+                                ? x.Games.Where(y => y.State == Models.Enums.GameState.Completed).MinBy(y => y.Trying):null
+                }
+        ).Where(x => x.GameCount >= minWons).ToList();
+
+    public Object GetLider(int id)
+    {
+        var gamer = _gamerRepository.Get(id);
+        return new { gamer.Id, gamer.Name, gamer.Games };
+    }
+
+    public List<Log> GetGameLogs(int gameId) => _conterxt.Logs.Where(x => x.GameId == gameId).ToList();
 }

@@ -7,10 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+string connectionString = builder.Configuration.GetSection("ConnectionStrings")["mssql"];
+
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseInMemoryDatabase("GuessingGame");
+    //options.UseInMemoryDatabase("GuessNumber");
+    options.UseSqlServer(connectionString);
 });
 
 builder.Services.AddScoped<IGameRepository, GameRepository>();

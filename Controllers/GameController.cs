@@ -33,12 +33,22 @@ namespace GuessingGame.Controllers
         public IActionResult GetGame(int id)
         {
             var game = _gameService.Get(id);
-            if(game != null)
-                game.GuessNumber = 0;
             return Ok(game);
         }
 
         [HttpGet("gamers")]
         public IActionResult Gamers() => Ok(_gameService.GetGamers());
+
+        [HttpGet("liders/{minWons}")]
+        public IActionResult GetLiders(int minWons) => Ok(_gameService.GetLiders(minWons));
+
+        [HttpGet("lider/{id}")]
+        public IActionResult GetLider(int id)=> Ok(_gameService.GetLider(id));
+
+        [HttpGet("gamelog/{gameId}")]
+        public IActionResult GetGameLogs(int gameId)
+        {
+            return Ok(_gameService.GetGameLogs(gameId)??new List<Models.Log>());
+        }
     }
 }
