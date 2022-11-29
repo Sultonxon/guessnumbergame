@@ -1,0 +1,37 @@
+
+<form >
+    <div class="form-group">
+        <label>Insert Number</label>
+        <input  required maxlength="4" minlength="4" [formControl]="control" [(ngModel)]="answer" name="guessedNumber"  class="form-control"/>
+        <ul class="text-danger" *ngIf="control.dirty && control.invalid">
+            <li *ngIf="control.dirty && control.errors?.['required']">
+                You must enter number
+            </li>            
+            <li *ngIf="control.dirty && (control.errors?.['minlength'] || control.errors?.['maxlength'])">
+                number must consist of 4 digits
+            </li>
+        </ul>
+    </div>
+
+    <div class="form-group text-center">
+        <button [hidden]="isGameEnded" [disabled]="!valid" (click)="submitForm()" class="btn btn-primary">Check answer</button>
+        <span class="text-danger" *ngIf="isGameEnded && !isGameSuccessed">
+            Game Failed Guessed Number is {{guessedNumber}}
+        </span>
+        <span class="text-success" *ngIf="isGameEnded && isGameSuccessed">
+            Game Successed
+        </span>
+        <button class="btn btn-outline-info" [routerLink]="['']">New Game</button>
+    </div>    
+</form>
+
+<table class="table ">
+    <tbody>
+        <tr *ngFor="let log of gameLogs">
+            <td>{{log.number}}</td>
+            <td>{{log.step}}</td>
+            <td>{{log.m}}</td>
+            <td>{{log.p}}</td>
+        </tr>
+    </tbody>
+</table>

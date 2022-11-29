@@ -1,0 +1,18 @@
+
+<div class="p-2 bg-success text-white text-center">
+    Lider Board
+</div>
+<button [routerLink]="['']" class="btn btn-outline-primary">Continue Playing</button>
+<input class="form-control"  (input)="init()" [(ngModel)]="minWons" type="number" />
+<table class="table">
+    <tr>
+        <th>Name</th><th>Count of all completed games</th><th></th>
+    </tr>
+    <tbody>
+        <tr *ngFor="let l of liders">
+            <td>{{l.name}}</td>
+            <td>{{l.gameCount}}</td>
+        </tr>
+    </tbody>
+</table>
+ 

@@ -1,0 +1,15 @@
+
+.link {
+    text-decoration: none;
+    margin: 20px;
+}
+
+
+
+input.ng-dirty.ng-invalid{
+    border: 3px solid #ff0000;
+}
+
+input.ng-dirty.ng-valid{
+    border: 3px solid #6bc502;
+}
