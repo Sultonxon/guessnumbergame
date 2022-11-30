@@ -12,8 +12,8 @@ string connectionString = builder.Configuration.GetSection("ConnectionStrings")[
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    //options.UseInMemoryDatabase("GuessNumber");
-    options.UseSqlServer(connectionString);
+    options.UseInMemoryDatabase("GuessNumber");
+    //options.UseSqlServer(connectionString);
 });
 
 builder.Services.AddScoped<IGameRepository, GameRepository>();
